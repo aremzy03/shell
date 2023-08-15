@@ -43,21 +43,14 @@ int main(void)
 	}
 	argv[i] = NULL;
 	i = 0;
-	while (argv[i])
+	snprintf(cat, sizeof(cat), "%s%s", cat, argv[0]);
+	for (i = 0; argv[i] != NULL; i++)
 	{
-		if (i == 0)
-		{
-			strcat(cat, argv[i]);
-			exe[i] = strdup(cat);
-		}
-		else
-		{
-			exe[i] = strdup(argv[i]);
-			printf("%s\n", exe[i]);
-		}
-		i++;
+		exe[i] = strdup(argv[i]);
+		printf("exe[%d] is %s\n", i, exe[i]);
 	}
-	i = 0;
+	exe[i] = NULL;
+	
 	mypid = fork();
 	if(mypid == -1)
 	{
@@ -66,7 +59,7 @@ int main(void)
 	}
 	if (mypid == 0)
 	{
-		run = execve(exe[0], exe, NULL);
+		run = execvp(exe[0], exe);
 		if (run == -1)
 		{
 			perror("Error3\n");
@@ -78,11 +71,10 @@ int main(void)
 		wait(NULL);
 	}
 	free(cmd), free(cmd_cpy), free(argv); //free(cat);
-	i = 0;
-	while(exe[i])
+	
+	for (i = 0; exe[i] != NULL; i++)
 	{
 		free(exe[i]);
-		i++;
 	}
 	
 	return (0);
