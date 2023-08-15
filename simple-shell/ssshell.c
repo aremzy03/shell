@@ -11,26 +11,29 @@ int main(void)
 	size_t n;
 	char **argv = NULL, *cmd = NULL, *cmd_cpy = NULL, *token = NULL;
 	char *exe[100];
-	char *delim = " \n", cat[100] = "/bin/";
+	char *delim = " \n", cat[200] = "/bin/";
 	int argc = 0, i = 0, command, run;
 	int line;
 
 
 	printf("$ ");
+	/*GETLINE FUNCTION TO GET INPUT*/
 	command = getline(&cmd, &n, stdin);
 	if (command == -1)
 	{
 		perror("Error1\n");
 		exit(1);
 	}
-	cmd_cpy = strdup(cmd);
+	cmd_cpy = strdup(cmd);//A COPY OF THE CMD TO SPLIT WITH STRTOK
 	token = strtok(cmd, delim);
+	/*GETTING THE SIZE OF ARGUEMENTS AND PRINTING IT OUT*/
 	while (token)
 	{
 		token = strtok(NULL, delim);
 		argc++;
 	}
 	printf("%d\n", argc);
+	/*ALLOCATING MEMORY FOR THE COMMANDS AND SPLITTING IT TO AN ARRAY(argv)*/
 	argv = malloc(sizeof(char* ) * (argc + 1));
 	token = strtok(cmd_cpy, delim);
 	i = 0;
@@ -42,15 +45,18 @@ int main(void)
 		i++;
 	}
 	argv[i] = NULL;
+	/*MAKING A COPY OF argv FOR THE execve() FUNCTION*/
 	i = 0;
-	snprintf(cat, sizeof(cat), "%s%s", cat, argv[0]);
-	for (i = 0; argv[i] != NULL; i++)
+	strcat(cat, argv[0]);//constructing the PATH FOR the command (/bin/)
+	exe[0] = strdup(cat);
+	for (i = 1; argv[i] != NULL; i++)
 	{
 		exe[i] = strdup(argv[i]);
 		printf("exe[%d] is %s\n", i, exe[i]);
 	}
 	exe[i] = NULL;
-	
+	printf("%s\n", cat);
+	/* CREATING A NEW PROCESS AND EXECUTING THE COMMAND*/
 	mypid = fork();
 	if(mypid == -1)
 	{
@@ -59,7 +65,7 @@ int main(void)
 	}
 	if (mypid == 0)
 	{
-		run = execvp(exe[0], exe);
+		run = execve(exe[0], exe, NULL);
 		if (run == -1)
 		{
 			perror("Error3\n");
@@ -70,6 +76,7 @@ int main(void)
 	{
 		wait(NULL);
 	}
+	/*FREEING ALLOCATED MEMORY*/
 	free(cmd), free(cmd_cpy), free(argv); //free(cat);
 	
 	for (i = 0; exe[i] != NULL; i++)
