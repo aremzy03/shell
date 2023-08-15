@@ -46,9 +46,15 @@ int main(void)
 	}
 	argv[i] = NULL;
 	/*MAKING A COPY OF argv FOR THE execve() FUNCTION*/
-	i = 0;
-	strcat(cat, argv[0]);//constructing the PATH FOR the command (/bin/)
-	exe[0] = strdup(cat);
+	if (strstr(argv[0], cat) != NULL)
+	{
+		exe[0] = strdup(argv[0]);
+	}
+	else
+	{
+		strcat(cat, argv[0]);//constructing the PATH FOR the command (/bin/)
+		exe[0] = strdup(cat);
+	}
 	for (i = 1; argv[i] != NULL; i++)
 	{
 		exe[i] = strdup(argv[i]);
